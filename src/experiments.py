@@ -42,7 +42,7 @@ def copy(source, dest):
     handle.close()
 
 def copy_to_library(path_name, file_date, file_maker):
-    dest_folder = os.path.join('D:/Img/', str(file_date.year), file_maker)
+    dest_folder = os.path.join('F:/Img/', str(file_date.year), file_maker)
     if not os.path.exists(dest_folder):
         os.makedirs(dest_folder)
     copy_count = 0
@@ -70,7 +70,7 @@ def add_to_library(file_path):
     image_date = get_date_from_tags(tags) or get_date_from_os(file_path)
     image_make = 'Unknown'
     if EXIF_IMAGE_MAKE in tags:
-        image_make = str(tags[EXIF_IMAGE_MAKE])
+        image_make = str(tags[EXIF_IMAGE_MAKE]).strip()
     if image_date:
         copy_to_library(file_path, image_date, image_make)
     else:
@@ -84,6 +84,8 @@ def walk_images():
     for (root, _, files) in os.walk('D:/OneDrive/Immagini', topdown=True):
         files = [file for file in files if file != 'desktop.ini']
         for file in files:
+            print(' ' * 100, end='\r')
+            print(f'\rProcessed: {count}\tCopied: {copied_count}\tDuplicated: {duplicated_count}\tException: {exception_count}\tCurrent:{file}', end='\r')
             file_path=os.path.join(root, file)
             try:
                 add_to_library(file_path)
@@ -94,7 +96,6 @@ def walk_images():
                 exception_count+=1
                 logging.exception(ex)
             count+=1
-            print(f'\rProcessed: {count}\tCopied: {copied_count}\tDuplicated: {duplicated_count}\tException: {exception_count}', end='\r')
 
 if __name__ == "__main__":
     logging.basicConfig(
